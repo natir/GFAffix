@@ -946,49 +946,49 @@ fn root(classes: &mut Vec<(usize, usize)>, i: usize) -> usize {
     r
 }
 
-//fn consolidate_transform(graph: &HashGraph, mod_subg: &ModifiedSubGraph, transform: &
-//    FxHashMap<(usize, usize), Vec<(usize, Direction, usize)>>, unchopped: FxHashMap<Vec<Handle>>, ) -> FxHashMap<Vec<(usize, Direction, usize)>, Vec<(usize, Direction, usize)>> {
-//
-//    let collapsed_paths : FxHashMap<Vec<Handle>, (usize, Direction, usize)> = FxHashMap::default();
-//
-//    for p in transform.values_mut() {
-//        let new_p : Vec<(usize, Direction, usize)> = Vec::default();
-//        let mut has_changed = false;
-//        let it = p.iter();
-//        while it.has_next() {
-//            let (vid, vo, vl) = it.next();
-//            let v = Handle::pack(vid, vo);
-//            if corrected_degree(graph, mod_subg, v) == 1 {
-//                // find maximal compressable path
-//                let cur_p Vec<Handle> = vec![v];
-//                while it.has_next() && corrected_degree(graph, mod_subg, cur_p[-1]) == 1 {
-//                    let u = it.filter(|x| !mod_subg.node_deleted(x)).next().unwrap();
-//                    cur_p.push(u);
-//                }
-//                if collapsed_paths.contains_key(cur_p) {
-//                    new_p.push(collapsed_paths.get(cur_p).unwrap());
-//                } else {
-//                    let cur_p_rev = cur_p.iter().reverse().map(|x| x.flip()).collect();
-//                    if collapsed_paths.contains_key(cur_p_rev) {
-//                        let (cid, co, cl) = collapsed_paths.get(cur_p_rev).unwrap();
-//                        new_p.push((cid, if co == Direction::Left { Direction::Right } else { Direction::Right }, cl));
-//                    } else {
-//                        let seq: Vec<u8> = cur_p.map(|u| graph.sequence_vec(u)).collect()[..]).concat();
-//                        let u = graph.append_handle(seq);
-//                        new_p.push((u.unpack_number(), if u.is_reverse() { Direction::Left } else { Direction::Right }, seq.len()));
-//                    }
-//                }
-//                has_changed = true;
-//            } else {
-//                new_p.push((vid, vo, vl));
-//            }
-//        }
-//        if has_changed {
-//            p.clear();
-//            p.extend(new_p);
-//        }
-//    }
-//}
+fn consolidate_transform(graph: &HashGraph, mod_subg: &ModifiedSubGraph, transform: &
+    FxHashMap<(usize, usize), Vec<(usize, Direction, usize)>>, unchopped: FxHashMap<Vec<Handle>>, ) -> FxHashMap<Vec<(usize, Direction, usize)>, Vec<(usize, Direction, usize)>> {
+
+    let collapsed_paths : FxHashMap<Vec<Handle>, (usize, Direction, usize)> = FxHashMap::default();
+
+    for p in transform.values_mut() {
+        let new_p : Vec<(usize, Direction, usize)> = Vec::default();
+        let mut has_changed = false;
+        let it = p.iter();
+        while it.has_next() {
+            let (vid, vo, vl) = it.next();
+            let v = Handle::pack(vid, vo);
+            if corrected_degree(graph, mod_subg, v) == 1 {
+                // find maximal compressable path
+                let cur_p Vec<Handle> = vec![v];
+                while it.has_next() && corrected_degree(graph, mod_subg, cur_p[-1]) == 1 {
+                    let u = it.filter(|x| !mod_subg.node_deleted(x)).next().unwrap();
+                    cur_p.push(u);
+                }
+                if collapsed_paths.contains_key(cur_p) {
+                    new_p.push(collapsed_paths.get(cur_p).unwrap());
+                } else {
+                    let cur_p_rev = cur_p.iter().reverse().map(|x| x.flip()).collect();
+                    if collapsed_paths.contains_key(cur_p_rev) {
+                        let (cid, co, cl) = collapsed_paths.get(cur_p_rev).unwrap();
+                        new_p.push((cid, if co == Direction::Left { Direction::Right } else { Direction::Right }, cl));
+                    } else {
+                        let seq: Vec<u8> = cur_p.map(|u| graph.sequence_vec(u)).collect()[..]).concat();
+                        let u = graph.append_handle(seq);
+                        new_p.push((u.unpack_number(), if u.is_reverse() { Direction::Left } else { Direction::Right }, seq.len()));
+                    }
+                }
+                has_changed = true;
+            } else {
+                new_p.push((vid, vo, vl));
+            }
+        }
+        if has_changed {
+            p.clear();
+            p.extend(new_p);
+        }
+    }
+}
 
 fn corrected_degree(graph: &HashGraph, mod_subg: &ModifiedSubGraph, v: Handle) -> usize {
     let mut d = 0;
@@ -1383,26 +1383,26 @@ fn main() -> Result<(), io::Error> {
     log::info!("expand transformation table");
     let transform = event_tracker.get_expanded_transformation();
 
-//    log::info!("unchopping modified paths");
-//
-//    let mut involved_nodes: FxHashSet<Handle> = FxHashSet::default();
-//    for p in transform.values() {
-//        involved_nodes.extend(p.iter().map(|(vid, _)| Handle::pack(*vid, false)));
-//        involved_nodes.extend(
-//            graph
-//                .neighbors(p.first().unwrap().0, Direction::Left)
-//                .filter(|u| !mod_subg.node_deleted(&u))
-//                .collect::<Vec<Handle>>(),
-//        );
-//        involved_nodes.extend(
-//            graph
-//                .neighbors(p.last().unwrap().0, Direction::Right)
-//                .filter(|u| !mod_subg.node_deleted(&u))
-//                .collect::<Vec<Handle>>(),
-//        );
-//    }
-//
-//    unchop(&mut graph, &mut mod_subg, involved_nodes);
+    log::info!("unchopping modified paths");
+
+    let mut involved_nodes: FxHashSet<Handle> = FxHashSet::default();
+    for p in transform.values() {
+        involved_nodes.extend(p.iter().map(|(vid, _)| Handle::pack(*vid, false)));
+        involved_nodes.extend(
+            graph
+                .neighbors(p.first().unwrap().0, Direction::Left)
+                .filter(|u| !mod_subg.node_deleted(&u))
+                .collect::<Vec<Handle>>(),
+        );
+        involved_nodes.extend(
+            graph
+                .neighbors(p.last().unwrap().0, Direction::Right)
+                .filter(|u| !mod_subg.node_deleted(&u))
+                .collect::<Vec<Handle>>(),
+        );
+    }
+
+    unchop(&mut graph, &mut mod_subg, involved_nodes);
 
     if params.check_transformation {
         log::info!("checking correctness of applied transformations...");
